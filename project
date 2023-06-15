@@ -1,0 +1,256 @@
+import mysql.connector
+import random
+
+choice =0
+try:
+    con = mysql.connector.connect(host="localhost", port=3306, user="root", password="", database="ATM")
+    cursor = con.cursor()
+    print("1.New User")
+    print("2.Old user")
+    print("3.Exit")
+    print("enter your choice = ",end="")
+    choice=int(input())
+
+except:
+    print("Database not connect")
+
+    
+def New_user():
+    m_no=str(input("Enter 10 digit Mobile number = "))
+    while (len(m_no)!=10):
+        print("Please enter 10 digit mobile number ")
+        New_user()
+    if (len(m_no)==10):
+        try:
+            sql="select mobile_no from user_details where mobile_no ="
+            sql3=(sql+m_no)
+            #print(sql3)
+            cursor.execute(sql3)
+            s3=cursor.fetchall()
+            """print(s3)
+            print(s3[0])
+            print(s3[0][0])"""
+            s4=s3[0][0]
+            if(s4==m_no):
+                print("This mobile Mobile number is already  Register")
+                New_user()
+        except:
+            otp = random.randint(1001,9999)
+            print("Your 4-digit OTP = ",otp)
+            e_otp=int(input("Enter the OTP = "))
+            while (otp!=e_otp):
+                print("please enter valid OTP")
+                e_otp=int(input("Enter the OTP = "))
+            if (otp==e_otp):
+                pin =input("Register your PIN number = ")
+                name=str(input("Account Holder Name = "))
+                print("your details are correct or not : ",name,m_no,pin)
+                print("1.yes")
+                print("2.no")
+                ans=int(input())
+                if (ans==1):
+                    our_pin=m_no+pin
+                    #print(our_pin)
+                    sql="insert into user_details (name,mobile_no,Pin,Our_pin) values(%s,%s,%s,%s)"
+                    sql2=(name,m_no,pin,our_pin)
+                    cursor.execute(sql,sql2)
+                    con.commit()
+                    print("Your details Successfully Register ")
+                else:
+                    print("Kindly Enter Your Correct Details Again")
+                    New_user()
+
+
+
+
+def Deposit():
+    inp_m_no=input("Enter your Mobile number = ")
+    inp_pin=input("Enter your Pin Number = ")
+    try:
+        sql="select our_pin from user_details where our_pin = "
+        sql2=inp_m_no+inp_pin
+        sql3=(sql+sql2)
+        #print(sql3)
+        cursor.execute(sql3)
+        s3=cursor.fetchall()
+        """print(s3)
+        print(s3[0])
+        print(s3[0][0])"""
+        s4=s3[0][0]
+        if (s4==sql2):
+            amount=int(input("Enter Your Amount = "))
+            sql="select balance from user_details where our_pin = "
+            sql3=(sql+sql2)
+            #print(sql3)
+            cursor.execute(sql3)
+            s3=cursor.fetchall()
+            """print(s3)
+            print(s3[0])
+            print(s3[0][0])"""
+            s4=s3[0][0]           
+            amount=amount+s4
+            sql = "update user_details set balance="
+            sql3=" where our_pin = "
+            sql4=(sql+str(amount)+sql3+sql2)
+            #print(sql4)
+            cursor.execute(sql4)
+            con.commit()
+            print("Amount deposit  successfully")
+    except:
+        print("Incorrect  Mobile no or Pin ")
+        print("Please Enter correct Valid details")
+        Deposit()
+    
+        
+
+def Withdrawel():
+    inp_m_no=input("Enter your Mobile number = ")
+    inp_pin=input("Enter your Pin Number = ")
+    try:
+        sql="select our_pin from user_details where our_pin = "
+        sql2=inp_m_no+inp_pin
+        sql3=(sql+sql2)
+        #print(sql3)
+        cursor.execute(sql3)
+        s3=cursor.fetchall()
+        """print(s3)
+        print(s3[0])
+        print(s3[0][0])"""
+        s4=s3[0][0]
+        if (s4==sql2):
+            amount=int(input("Enter Your Amount = "))
+            sql="select balance from user_details where our_pin = "
+            sql3=(sql+sql2)
+            #print(sql3)
+            cursor.execute(sql3)
+            s3=cursor.fetchall()
+            """print(s3)
+            print(s3[0])
+            print(s3[0][0])"""
+            s4=s3[0][0]           
+             #s4 is our balance
+            while(amount>s4):
+                print("your balance is Low")
+                amount=int(input("Enter Your Amount = "))
+            if(amount<s4):
+                amount=s4-amount
+                sql = "update user_details set balance="
+                sql3=" where our_pin = "
+                sql4=(sql+str(amount)+sql3+sql2)
+                #print(sql4)
+                cursor.execute(sql4)
+                con.commit()
+                print("Amount withdrawel  successfully")
+    except:
+        print("Incorrect  Mobile no or Pin ")
+        print("Please Enter correct Valid details")
+        Withdrawel()
+
+def Balance():
+    inp_m_no=input("Enter your Mobile number = ")
+    inp_pin=input("Enter your Pin Number = ")
+    try:
+        sql="select our_pin from user_details where our_pin = "
+        sql2=inp_m_no+inp_pin
+        sql3=(sql+sql2)
+        #print(sql3)
+        cursor.execute(sql3)
+        s3=cursor.fetchall()
+        """print(s3)
+        print(s3[0])
+        print(s3[0][0])"""
+        s4=s3[0][0]
+        if (s4==sql2):
+            sql="select balance from user_details where our_pin = "
+            sql3=(sql+sql2)
+            #print(sql3)
+            cursor.execute(sql3)
+            s3=cursor.fetchall()
+            """print(s3)
+            print(s3[0])
+            print(s3[0][0])"""
+            s4=s3[0][0]  
+            print("Your Account Balance is = ",s3[0][0])
+    except:
+        print("Incorrect  Mobile no or Pin ")
+        print("Please Enter correct Valid details")
+        Balance()
+
+def Pin():
+    m_no=input("Enter Register Mobile number = ")
+    try:
+        sql="select mobile_no from user_details where mobile_no = "
+        sql3=(sql+m_no)
+        #print(sql3)
+        cursor.execute(sql3)
+        s3=cursor.fetchall()
+        """print(s3)
+        print(s3[0])
+        print(s3[0][0])"""
+        s4=s3[0][0]
+        while(s4!=m_no):
+            print("Please enter Register Mobile number")
+            Pin()
+        if(s4==m_no):
+            otp = random.randint(1001,9999)
+            print("Your 4-digit OTP = ",otp)
+            e_otp=int(input("Enter the OTP = "))
+            while (otp!=e_otp):
+                print("please enter valid OTP")
+                e_otp=int(input("Enter the OTP = "))
+            if (otp==e_otp):
+                 pin =input("Register your PIN number = ")
+            # update pin in database
+                 sql = "update user_details set pin="
+                 sql3=" where mobile_no = "
+                 sql4=(sql+pin+sql3+m_no)
+                 #print(sql4)
+                 cursor.execute(sql4)
+                 con.commit()
+            # update our_pin in database
+                 sql = "update user_details set our_pin="
+                 sql2=m_no+str(pin)
+                 sql3=" where mobile_no = "
+                 sql4=(sql+sql2+sql3+m_no)
+                 #print(sql4)
+                 cursor.execute(sql4)
+                 con.commit()
+
+                 print("your pin is changed success fully")
+    except:
+        print("Incorrect  Mobile no or Pin ")
+        print("Please Enter correct Valid details")
+        Pin()
+        
+          
+      
+if choice==1:
+    New_user()
+elif choice==2:
+    while(1):
+        print("1.cash deposit ")
+        print("2.cash withdrawal")
+        print("3.check Balance")
+        print("4.Pin change")
+        print("5.Exit")
+        a=int(input("Enter your choice  = "))
+        while(a==0 or a>5):
+            print("plese enter Valid choice = ",end="")
+            a=int(input())
+        if(a==4):
+            Pin()
+        elif(a==1):
+            Deposit()
+        elif(a==2):
+            Withdrawel()
+        elif(a==3):
+            Balance()
+        elif(a==5):
+                break
+elif choice==3:
+    print("Thank You For Using ATM transaction")
+    exit()
+            
+else:
+    print("wrong option")
+
